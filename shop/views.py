@@ -2,6 +2,9 @@ from django.shortcuts import render
 from .models import Product, ProductCategory, Order
 from django.db.models import Sum, Value
 from django.db.models.functions import Coalesce
+from django.shortcuts import render, get_object_or_404
+from django.db.models import Count
+
 
 def home(request):
     popular_products = Product.objects.annotate(
@@ -25,7 +28,11 @@ def product_detail(request, pk):
     return render(request, 'product_detail.html', {'product': product})
 
 def category_list(request):
-    categories = ProductCategory.objects.all()
+    categories = ProductCategory.objects.annotate(
+        product_count=Count('products', distinct=True),  # Кол-во товаров в категории
+        ordered_items_count=Count('products__order_items', distinct=True),  # Кол-во заказанных позиций
+        total_quantity_ordered=Sum('products__order_items__quantity'),  # Суммарное кол-во заказанных товаров
+    )
     return render(request, 'category_list.html', {'categories': categories})
 
 def order_detail(request, pk):

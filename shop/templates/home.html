@@ -21,7 +21,7 @@
                     <h5>{{ product.name }}</h5>
                     <p>Цена: {{ product.price }} ₽</p>
                     <p>Продано: {{ product.sold_quantity }}</p>
-                    <a href="{% url 'product_detail' product.id %}" class="btn btn-primary btn-sm">Подробнее</a>
+                    <a href="{% url 'shop:product_detail' product.id %}" class="btn btn-primary btn-sm">Подробнее</a>
                 </div>
             </div>
             {% empty %}
@@ -43,7 +43,7 @@
             <li class="list-group-item">Нет новых категорий</li>
             {% endfor %}
         </ul>
-        <a href="{% url 'category_list' %}">Все категории</a>
+        <a href="{% url 'shop:category_list' %}">Все категории</a>
     </section>
 
     <!-- Виджет 3: Последние заказы -->
@@ -57,7 +57,7 @@
                     {{ order.date_ordered|date:"d.m.Y H:i" }}<br>
                     Статус: {{ order.status }}
                 </div>
-                <a href="{% url 'order_detail' order.id %}" class="btn btn-outline-primary btn-sm">Просмотреть заказ</a>
+                <a href="{% url 'shop:order_detail' order.id %}" class="btn btn-outline-primary btn-sm">Просмотреть заказ</a>
             </li>
             {% empty %}
             <li class="list-group-item">Нет заказов</li>
@@ -68,7 +68,7 @@
     <!-- Виджет 4: Поиск товаров -->
     <section>
         <h2>Поиск товаров</h2>
-        <form method="get" action="{% url 'product_search' %}" class="row g-3">
+        <form method="get" action="{% url 'shop:product_search' %}" class="row g-3">
             <div class="col-md-6">
                 <input type="text" name="query" class="form-control" placeholder="Название товара">
             </div>
