@@ -1,0 +1,22 @@
+<!-- shop/templates/shop/category_list.html -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <title>Список категорий</title>
+</head>
+<body>
+    <h1>Категории товаров</h1>
+    <ul>
+        {% for category in categories %}
+            <li>
+                <strong>{{ category.name }}</strong><br />
+                <small>{{ category.description }}</small>
+            </li>
+        {% empty %}
+            <li>Категории не найдены.</li>
+        {% endfor %}
+    </ul>
+    <a href="{% url 'shop:home' %}">← На главную</a>
+</body>
+</html>

@@ -5,7 +5,7 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('shop.urls')),  # <-- добавляем эту строку
+    path('', include(('shop.urls', 'shop'), namespace='shop')),  # <-- добавляем эту строку
 ]
 
 # Добавляем работу с медиафайлами в режиме DEBUG

@@ -1,0 +1,35 @@
+<!-- shop/templates/shop/product_search.html -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <title>Результаты поиска</title>
+</head>
+<body>
+    <h1>Поиск товаров</h1>
+
+    <form method="get" action="{% url 'shop:product_search' %}">
+        <input type="text" name="query" placeholder="Название товара" value="{{ query }}">
+        <select name="category">
+            <option value="">Все категории</option>
+            {% for cat in all_categories %}
+                <option value="{{ cat.id }}" {% if cat.id|stringformat:"s" == request.GET.category %}selected{% endif %}>{{ cat.name }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit">Найти</button>
+    </form>
+
+    <h2>Результаты поиска:</h2>
+    <ul>
+        {% for product in products %}
+            <li>
+                <a href="{% url 'shop:product_detail' product.id %}">{{ product.name }}</a> — {{ product.price }} ₽
+            </li>
+        {% empty %}
+            <li>Товары не найдены.</li>
+        {% endfor %}
+    </ul>
+
+    <a href="{% url 'shop:home' %}">← На главную</a>
+</body>
+</html>
