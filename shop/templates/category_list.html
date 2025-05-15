@@ -1,22 +1,29 @@
-<!-- shop/templates/shop/category_list.html -->
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8" />
-    <title>Список категорий</title>
+    <title>Категории товаров</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-    <h1>Категории товаров</h1>
-    <ul>
+<div class="container py-4">
+
+    <h1 class="mb-4">Категории товаров</h1>
+
+    <ul class="list-group mb-4">
         {% for category in categories %}
-            <li>
-                <strong>{{ category.name }}</strong><br />
-                <small>{{ category.description }}</small>
+            <li class="list-group-item">
+                <h5>{{ category.name }}</h5>
+                <p>{{ category.description|truncatewords:20 }}</p>
+                <a href="{% url 'shop:category_list' %}" class="btn btn-sm btn-outline-primary">Подробнее</a>
             </li>
         {% empty %}
-            <li>Категории не найдены.</li>
+            <li class="list-group-item">Категории не найдены.</li>
         {% endfor %}
     </ul>
-    <a href="{% url 'shop:home' %}">← На главную</a>
+
+    <a href="{% url 'shop:home' %}" class="btn btn-link">← На главную</a>
+
+</div>
 </body>
 </html>

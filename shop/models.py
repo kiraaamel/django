@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.db.models import Sum, F
+from django.core.exceptions import ValidationError
 
 class ProductCategory(models.Model):
     name = models.CharField(max_length=100, verbose_name="Название категории")
@@ -17,7 +19,7 @@ class Product(models.Model):
     GENDER_CHOICES = [
         ('male', 'Мужской'),
         ('female', 'Женский'),
-        ('unisex', 'Унисекс'),
+        ('kids', 'Детский'),
     ]
 
     name = models.CharField(max_length=200, verbose_name="Название товара")
@@ -33,7 +35,6 @@ class Product(models.Model):
 
     @property
     def sold_quantity(self):
-        # Считаем, сколько товаров продано
         total = sum(item.quantity for item in self.order_items.all())
         return total
 
@@ -64,7 +65,7 @@ class Order(models.Model):
     client = models.ForeignKey(Client, on_delete=models.CASCADE, verbose_name="Клиент")
     date_ordered = models.DateTimeField(auto_now_add=True, verbose_name="Дата заказа")
     status = models.CharField(max_length=50, choices=[('processing', 'В процессе'), ('shipped', 'Отправлен')], verbose_name="Статус")
-    total_price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Общая сумма")
+    total_price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Общая сумма", default=0)
     date_received = models.DateTimeField(blank=True, null=True, verbose_name="Дата получения")
 
     def __str__(self):
@@ -73,6 +74,15 @@ class Order(models.Model):
     class Meta:
         verbose_name = "Заказ"
         verbose_name_plural = "Заказы"
+
+    def calculate_total_price(self):
+        total = self.order_items.aggregate(
+            total=Sum(F('quantity') * F('product__price'))
+        )['total'] or 0
+        return total
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='order_items')
@@ -88,10 +98,35 @@ class OrderItem(models.Model):
         verbose_name = "Товар в заказе"
         verbose_name_plural = "Товары в заказах"
 
+    def clean(self):
+        if self.product.stock_quantity < self.quantity:
+            raise ValidationError(
+                f'Недостаточно товара на складе: доступно {self.product.stock_quantity}, запрошено {self.quantity}')
+
+    def save(self, *args, **kwargs):
+        self.clean()
+        if self.pk is None:
+            self.product.stock_quantity -= self.quantity
+            if self.product.stock_quantity < 0:
+                raise ValidationError('Нельзя уменьшить остаток ниже нуля')
+            self.product.save()
+        else:
+            old = OrderItem.objects.get(pk=self.pk)
+            diff = self.quantity - old.quantity
+            if self.product.stock_quantity < diff:
+                raise ValidationError('Нельзя уменьшить остаток ниже нуля')
+            self.product.stock_quantity -= diff
+            self.product.save()
+        super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        self.product.stock_quantity += self.quantity
+        self.product.save()
+        super().delete(*args, **kwargs)
 class Payment(models.Model):
     order = models.OneToOneField(Order, on_delete=models.CASCADE, verbose_name="Заказ")
     payment_date = models.DateTimeField(auto_now_add=True, verbose_name="Дата платежа")
-    amount = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Сумма")
+    amount = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Сумма", null=True, blank=True)
     payment_method = models.CharField(max_length=50, choices=[('credit_card', 'Кредитная карта'), ('online', 'Онлайн-оплата')], verbose_name="Метод оплаты")
 
     def __str__(self):

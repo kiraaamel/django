@@ -1,35 +1,53 @@
-<!-- shop/templates/shop/product_search.html -->
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8" />
-    <title>Результаты поиска</title>
+    <title>Поиск товаров</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-    <h1>Поиск товаров</h1>
+<div class="container py-4">
 
-    <form method="get" action="{% url 'shop:product_search' %}">
-        <input type="text" name="query" placeholder="Название товара" value="{{ query }}">
-        <select name="category">
-            <option value="">Все категории</option>
-            {% for cat in all_categories %}
-                <option value="{{ cat.id }}" {% if cat.id|stringformat:"s" == request.GET.category %}selected{% endif %}>{{ cat.name }}</option>
-            {% endfor %}
-        </select>
-        <button type="submit">Найти</button>
+    <h1 class="mb-4">Поиск товаров</h1>
+
+    <form method="get" action="{% url 'shop:product_search' %}" class="row g-3 mb-4">
+        <div class="col-md-6">
+            <input
+                type="text"
+                name="query"
+                class="form-control"
+                placeholder="Название товара"
+                value="{{ query }}">
+        </div>
+        <div class="col-md-4">
+            <select name="category" class="form-select">
+                <option value="">Все категории</option>
+                {% for cat in all_categories %}
+                    <option value="{{ cat.id }}" {% if cat.id|stringformat:"s" == request.GET.category %}selected{% endif %}>
+                        {{ cat.name }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-primary w-100">Найти</button>
+        </div>
     </form>
 
-    <h2>Результаты поиска:</h2>
-    <ul>
+    <h2 class="mb-3">Результаты поиска:</h2>
+    <ul class="list-group">
         {% for product in products %}
-            <li>
-                <a href="{% url 'shop:product_detail' product.id %}">{{ product.name }}</a> — {{ product.price }} ₽
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <a href="{% url 'shop:product_detail' product.id %}">{{ product.name }}</a>
+                <span>{{ product.price }} ₽</span>
             </li>
         {% empty %}
-            <li>Товары не найдены.</li>
+            <li class="list-group-item">Товары не найдены.</li>
         {% endfor %}
     </ul>
 
-    <a href="{% url 'shop:home' %}">← На главную</a>
+    <a href="{% url 'shop:home' %}" class="btn btn-link mt-4">← На главную</a>
+
+</div>
 </body>
 </html>

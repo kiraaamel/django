@@ -1,23 +1,32 @@
-<!-- shop/templates/shop/product_detail.html -->
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8" />
-    <title>{{ product.name }} — Детали товара</title>
+    <title>{{ product.name }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-    <h1>{{ product.name }}</h1>
-    {% if product.image %}
-      <img src="{{ product.image.url }}" alt="{{ product.name }}" style="max-width:300px;" />
-    {% else %}
-      <p>Изображение отсутствует</p>
-    {% endif %}
+<div class="container py-4">
 
-    <p>Цена: {{ product.price }} ₽</p>
-    <p>Описание: {{ product.description }}</p>
-    <p>Категория: {{ product.category.name }}</p>
-    <p>Остаток на складе: {{ product.stock_quantity }}</p>
+    <a href="{% url 'shop:home' %}" class="btn btn-link mb-3">← На главную</a>
 
-    <a href="{% url 'shop:home' %}">← На главную</a>
+    <div class="row">
+        <div class="col-md-5">
+            {% if product.image %}
+                <img src="{{ product.image.url }}" alt="{{ product.name }}" class="img-fluid rounded">
+            {% else %}
+                <div class="bg-secondary text-white p-5 text-center">Нет изображения</div>
+            {% endif %}
+        </div>
+        <div class="col-md-7">
+            <h1>{{ product.name }}</h1>
+            <p class="fs-4">Цена: {{ product.price }} ₽</p>
+            <p>Категория: <a href="{% url 'shop:product_detail' product.category.id %}">{{ product.category.name }}</a></p>
+            <p>Описание: {{ product.description|linebreaks }}</p>
+            <p>Остаток на складе: {{ product.stock_quantity }}</p>
+        </div>
+    </div>
+
+</div>
 </body>
 </html>

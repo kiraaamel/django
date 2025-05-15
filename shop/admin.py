@@ -50,6 +50,15 @@ class OrderAdmin(admin.ModelAdmin):
     readonly_fields = ['total_price']
     inlines = [OrderItemInline, PaymentInline]
 
+    def save_related(self, request, form, formsets, change):
+        super().save_related(request, form, formsets, change)
+        order = form.instance
+        order.total_price = order.calculate_total_price()
+        order.save()
+        payments = Payment.objects.filter(order=order)
+        for payment in payments:
+            payment.amount = order.total_price
+            payment.save()
 admin.site.register(Order, OrderAdmin)
 
 # Клиенты
@@ -75,6 +84,6 @@ class PaymentAdmin(admin.ModelAdmin):
     list_display = ('order', 'payment_date', 'amount', 'payment_method')
     list_filter = ('payment_method',)
     search_fields = ('order__id', 'payment_method')
-    readonly_fields = ['amount']
+    readonly_fields = ['payment_date']
 
 admin.site.register(Payment, PaymentAdmin)

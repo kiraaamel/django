@@ -1,4 +1,3 @@
-from django.shortcuts import render
 from .models import Product, ProductCategory, Order
 from django.db.models import Sum, Value
 from django.db.models.functions import Coalesce
