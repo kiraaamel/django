@@ -25,7 +25,6 @@ class ProductAdmin(admin.ModelAdmin):
     @admin.display(description='В наличии')
     def is_in_stock(self, obj):
         return obj.remaining_stock > 0
-
 admin.site.register(Product, ProductAdmin)
 
 # Inline для платежей

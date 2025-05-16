@@ -6,6 +6,18 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
+<nav style="background-color: #222; padding: 10px; margin-bottom: 20px;">
+    <div style="max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; color: white;">
+        <a href="{% url 'shop:home' %}" style="color: white; font-weight: bold; text-decoration: none;">kiraaamelCloths</a>
+        <ul style="list-style: none; display: flex; gap: 20px; margin: 0; padding: 0;">
+            <li><a href="{% url 'shop:home' %}" style="color: white; text-decoration: none;">Главная</a></li>
+            <li><a href="{% url 'shop:product_list' %}" style="color: white; text-decoration: none;">Товары</a></li>
+            <li><a href="{% url 'shop:category_list' %}" style="color: white; text-decoration: none;">Категории</a></li>
+        </ul>
+    </div>
+</nav>
+
+
 <div class="container py-4">
 
     <a href="{% url 'shop:home' %}" class="btn btn-link mb-3">← На главную</a>
@@ -21,12 +33,16 @@
         <div class="col-md-7">
             <h1>{{ product.name }}</h1>
             <p class="fs-4">Цена: {{ product.price }} ₽</p>
-            <p>Категория: <a href="{% url 'shop:product_detail' product.category.id %}">{{ product.category.name }}</a></p>
+            <p>Категория: {{ product.category.name }}</p>
             <p>Описание: {{ product.description|linebreaks }}</p>
             <p>Остаток на складе: {{ product.stock_quantity }}</p>
+
+            <a href="{% url 'shop:product_edit' product.id %}" class="btn btn-warning mt-3">Редактировать товар</a>
         </div>
     </div>
 
 </div>
+
+
 </body>
 </html>

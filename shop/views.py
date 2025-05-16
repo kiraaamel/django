@@ -5,16 +5,22 @@ from django.db.models import Count
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import Product
 from .forms import ProductForm
-
+from django.db.models import Count, Sum, Value
+from django.db.models.functions import Coalesce
 
 def home(request):
     popular_products = Product.objects.annotate(
         total_sold=Coalesce(Sum('order_items__quantity'), Value(0))
     ).order_by('-total_sold')[:5]
 
-    new_categories = ProductCategory.objects.order_by('-created_at')[:5]
+    new_categories = ProductCategory.objects.annotate(
+        product_count=Count('products')
+    ).filter(product_count__gt=0).order_by('-product_count')[:5]
+
     latest_orders = Order.objects.order_by('-date_ordered')[:5]
-    all_categories = ProductCategory.objects.all()
+    all_categories = ProductCategory.objects.annotate(
+        product_count=Count('products')
+    ).order_by('-product_count')
 
     context = {
         'popular_products': popular_products,
@@ -23,6 +29,7 @@ def home(request):
         'all_categories': all_categories,
     }
     return render(request, 'home.html', context)
+
 
 def product_detail(request, pk):
     product = get_object_or_404(Product, pk=pk)

@@ -38,6 +38,8 @@ class Product(models.Model):
         total = sum(item.quantity for item in self.order_items.all())
         return total
 
+
+
     @property
     def remaining_stock(self):
         return self.stock_quantity - self.sold_quantity
