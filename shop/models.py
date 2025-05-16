@@ -123,6 +123,7 @@ class OrderItem(models.Model):
         self.product.stock_quantity += self.quantity
         self.product.save()
         super().delete(*args, **kwargs)
+
 class Payment(models.Model):
     order = models.OneToOneField(Order, on_delete=models.CASCADE, verbose_name="Заказ")
     payment_date = models.DateTimeField(auto_now_add=True, verbose_name="Дата платежа")
